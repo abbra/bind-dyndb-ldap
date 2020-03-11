@@ -881,6 +881,9 @@ static dns_dbmethods_t ldapdb_methods = {
 	hashsize,
 	nodefullname,
 	NULL, // getsize method not implemented (related BZ1353563)
+	NULL, /* setservestalettl */
+	NULL, /* getservestalettl */
+	NULL /* setgluecachestats */
 };
 
 isc_result_t ATTR_NONNULLS
