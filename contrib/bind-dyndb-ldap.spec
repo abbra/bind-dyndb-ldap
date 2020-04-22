@@ -3,7 +3,7 @@
 %define bind_version 32:9.11.11-1
 
 Name:           bind-dyndb-ldap
-Version:        11.2
+Version:        16.0
 Release:        0%{?dist}
 Summary:        LDAP back-end plug-in for BIND
 
@@ -32,6 +32,7 @@ off of your LDAP server.
 %setup -q -n %{name}-%{VERSION}
 
 %build
+export BIND9_CFLAGS="-I/usr/include/bind9"
 autoreconf -fiv
 %configure
 make %{?_smp_mflags}
