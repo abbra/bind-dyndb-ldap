@@ -19,7 +19,7 @@ jobs:
         set -e
         echo "Running autoconf generator"
         autoreconf -i -f
-        ./configure
+        BIND9_CFLAGS="-I/usr/include/bind9" ./configure
       displayName: Configure the project
     - template: templates/${{ variables.BUILD_TEMPLATE }}
     - template: templates/publish-build.yml

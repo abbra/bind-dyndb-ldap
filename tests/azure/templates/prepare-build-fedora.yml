@@ -3,6 +3,7 @@ steps:
     set -e
     sudo rm -rf /var/cache/dnf/*
     sudo dnf makecache || :
+    sudo dnf -y copr enable pemensik/bind-9.16
     echo "Installing base development environment"
     sudo dnf install -y \
         gdb-minimal \
