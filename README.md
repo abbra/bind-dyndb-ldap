@@ -607,4 +607,4 @@ Zone name will be automatically transformed before usage:
 # 7. License
 
 This package is licensed under the GNU General Public License, version 2
-only. See file COPYING for more information.
+or later. See file COPYING for more information.
