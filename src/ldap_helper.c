@@ -340,9 +340,9 @@ ldap_parse_rrentry(isc_mem_t *mctx, ldap_entry_t *entry, dns_name_t *origin,
 		   const settings_set_t * const settings,
 		   ldapdb_rdatalist_t *rdatalist) ATTR_NONNULLS ATTR_CHECKRESULT;
 
-static isc_result_t ldap_connect(ldap_instance_t *ldap_inst,
+static isc_result_t bdl_ldap_connect(ldap_instance_t *ldap_inst,
 		ldap_connection_t *ldap_conn, bool force) ATTR_NONNULLS ATTR_CHECKRESULT;
-static isc_result_t ldap_reconnect(ldap_instance_t *ldap_inst,
+static isc_result_t bdl_ldap_reconnect(ldap_instance_t *ldap_inst,
 		ldap_connection_t *ldap_conn, bool force) ATTR_NONNULLS ATTR_CHECKRESULT;
 static isc_result_t handle_connection_error(ldap_instance_t *ldap_inst,
 		ldap_connection_t *ldap_conn, bool force) ATTR_NONNULLS;
@@ -2797,8 +2797,8 @@ cleanup:
  * credentials and settings are available from the ldap_inst.
  */
 static isc_result_t ATTR_NONNULLS ATTR_CHECKRESULT
-ldap_connect(ldap_instance_t *ldap_inst, ldap_connection_t *ldap_conn,
-	     bool force)
+bdl_ldap_connect(ldap_instance_t *ldap_inst, ldap_connection_t *ldap_conn,
+		 bool force)
 {
 	LDAP *ld = NULL;
 	int ret;
@@ -2842,9 +2842,9 @@ ldap_connect(ldap_instance_t *ldap_inst, ldap_connection_t *ldap_conn,
 	if (ldap_conn->handle != NULL)
 		ldap_unbind_ext_s(ldap_conn->handle, NULL, NULL);
 	ldap_conn->handle = ld;
-	ld = NULL; /* prevent double-unbind from ldap_reconnect() and cleanup: */
+	ld = NULL; /* prevent double-unbind from bdl_ldap_reconnect() and cleanup: */
 
-	CHECK(ldap_reconnect(ldap_inst, ldap_conn, force));
+	CHECK(bdl_ldap_reconnect(ldap_inst, ldap_conn, force));
 	return result;
 
 cleanup:
@@ -2861,8 +2861,8 @@ cleanup:
 }
 
 static isc_result_t ATTR_NONNULLS ATTR_CHECKRESULT
-ldap_reconnect(ldap_instance_t *ldap_inst, ldap_connection_t *ldap_conn,
-	       bool force)
+bdl_ldap_reconnect(ldap_instance_t *ldap_inst, ldap_connection_t *ldap_conn,
+		   bool force)
 {
 	isc_result_t result;
 	int ret = 0;
@@ -3036,7 +3036,7 @@ handle_connection_error(ldap_instance_t *ldap_inst, ldap_connection_t *ldap_conn
 reconnect:
 		if (ldap_conn->handle == NULL && force == false)
 			log_error("connection to the LDAP server was lost");
-		result = ldap_connect(ldap_inst, ldap_conn, force);
+		result = bdl_ldap_connect(ldap_inst, ldap_conn, force);
 		if (result == ISC_R_SUCCESS)
 			log_info("successfully reconnected to LDAP server");
 		break;
@@ -3581,7 +3581,7 @@ remove_entry_from_ldap(dns_name_t *owner, dns_name_t *zone, ldap_instance_t *lda
 		 * successful
 		 * TODO: handle this case inside ldap_pool_getconnection()?
 		 */
-		CHECK(ldap_connect(ldap_inst, ldap_conn, false));
+		CHECK(bdl_ldap_connect(ldap_inst, ldap_conn, false));
 	}
 	ret = ldap_delete_ext_s(ldap_conn->handle, str_buf(dn), NULL, NULL);
 	result = (ret == LDAP_SUCCESS) ? ISC_R_SUCCESS : ISC_R_FAILURE;
@@ -3717,7 +3717,7 @@ ldap_pool_connect(ldap_pool_t *pool, ldap_instance_t *ldap_inst)
 	for (i = 0; i < pool->connections; i++) {
 		ldap_conn = NULL;
 		CHECK(new_ldap_connection(pool, &ldap_conn));
-		result = ldap_connect(ldap_inst, ldap_conn, false);
+		result = bdl_ldap_connect(ldap_inst, ldap_conn, false);
 		/* Continue even if LDAP server is down */
 		if (result != ISC_R_NOTCONNECTED && result != ISC_R_TIMEDOUT &&
 		    result != ISC_R_SUCCESS) {
@@ -4769,7 +4769,7 @@ ldap_syncrepl_watcher(isc_threadarg_t arg)
 			goto retry;
 		}
 
-		result = ldap_connect(inst, conn, true);
+		result = bdl_ldap_connect(inst, conn, true);
 		if (result != ISC_R_SUCCESS) {
 			log_error_r("reconnection to LDAP failed");
 			goto retry;
