@@ -6,7 +6,7 @@
 #include <isc/util.h>
 #include <dns/name.h>
 
-#include "config.h"
+#include "dyndb-config.h"
 #include "rbt_helper.h"
 #include "fwd_register.h"
 #include "util.h"

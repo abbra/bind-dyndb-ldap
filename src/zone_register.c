@@ -12,7 +12,7 @@
 #include <dns/result.h>
 #include <dns/zone.h>
 
-#include "config.h"
+#include "dyndb-config.h"
 #include "fs.h"
 #include "ldap_driver.h"
 #include "log.h"
