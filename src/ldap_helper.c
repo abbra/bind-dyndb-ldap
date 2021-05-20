@@ -1135,7 +1135,7 @@ cleanup:
  * Add zone to the view defined in inst->view.
  */
 static isc_result_t ATTR_NONNULLS ATTR_CHECKRESULT
-publish_zone(isc_task_t *task, ldap_instance_t *inst, dns_zone_t *zone)
+publish_zone(ldap_instance_t *inst, dns_zone_t *zone)
 {
 	isc_result_t result;
 	bool freeze = false;
@@ -1143,7 +1143,6 @@ publish_zone(isc_task_t *task, ldap_instance_t *inst, dns_zone_t *zone)
 	dns_view_t *view_in_zone = NULL;
 	isc_result_t lock_state = ISC_R_IGNORE;
 
-	UNUSED(task);
 	REQUIRE(inst != NULL);
 	REQUIRE(zone != NULL);
 
@@ -1199,7 +1198,7 @@ cleanup:
  * Add zone to view and call dns_zone_load().
  */
 static isc_result_t ATTR_NONNULLS ATTR_CHECKRESULT
-activate_zone(isc_task_t *task, ldap_instance_t *inst, dns_name_t *name) {
+activate_zone(ldap_instance_t *inst, dns_name_t *name) {
 	isc_result_t result;
 	dns_zone_t *raw = NULL;
 	dns_zone_t *secure = NULL;
@@ -1218,7 +1217,7 @@ activate_zone(isc_task_t *task, ldap_instance_t *inst, dns_name_t *name) {
 	 * otherwise it will race with zone->view != NULL check
 	 * in zone_maintenance() in zone.c.
 	 */
-	result = publish_zone(task, inst, toview);
+	result = publish_zone(inst, toview);
 	if (result != ISC_R_SUCCESS) {
 		dns_zone_log(toview, ISC_LOG_ERROR,
 			     "cannot add zone to view: %s",
@@ -1247,7 +1246,7 @@ cleanup:
  * and load zones.
  */
 isc_result_t
-activate_zones(isc_task_t *task, ldap_instance_t *inst) {
+activate_zones(ldap_instance_t *inst) {
 	isc_result_t result;
 	rbt_iterator_t *iter = NULL;
 	DECLARE_BUFFERED_NAME(name);
@@ -1270,7 +1269,7 @@ activate_zones(isc_task_t *task, ldap_instance_t *inst) {
 		++total_cnt;
 		if (active == true) {
 			++active_cnt;
-			result = activate_zone(task, inst, &name);
+			result = activate_zone(inst, &name);
 			if (result == ISC_R_SUCCESS)
 				++published_cnt;
 			result = fwd_configure_zone(settings, inst, &name);
@@ -2243,7 +2242,7 @@ ldap_parse_master_zoneentry(ldap_entry_t * const entry, dns_db_t * const olddb,
 	toview = (want_secure == true) ? secure : raw;
 	if (isactive == true) {
 		if (new_zone == true || activity_changed == true)
-			CHECK(publish_zone(task, inst, toview));
+			CHECK(publish_zone(inst, toview));
 		CHECK(load_zone(toview, false));
 		CHECK(fwd_configure_zone(zone_settings, inst, &entry->fqdn));
 	} else if (activity_changed == true) { /* Zone was deactivated */

@@ -132,6 +132,7 @@ finish(isc_task_t *task, isc_event_t *event) {
 	sync_state_t new_state;
 
 	REQUIRE(event != NULL);
+	UNUSED(task);
 
 	bev = (sync_barrierev_t *)event;
 	log_debug(1, "sync_barrier_wait(): finish reached");
@@ -155,7 +156,7 @@ finish(isc_task_t *task, isc_event_t *event) {
 	BROADCAST(&bev->sctx->cond);
 	UNLOCK(&bev->sctx->mutex);
 	if (new_state == sync_finished)
-		activate_zones(task, bev->inst);
+		activate_zones(bev->inst);
 
 	if (result != ISC_R_SUCCESS)
 		log_error_r("syncrepl finish() failed");
