@@ -1143,7 +1143,7 @@ publish_zone(isc_task_t *task, ldap_instance_t *inst, dns_zone_t *zone)
 	dns_view_t *view_in_zone = NULL;
 	isc_result_t lock_state = ISC_R_IGNORE;
 
-	REQUIRE(ISCAPI_TASK_VALID(task));
+	UNUSED(task);
 	REQUIRE(inst != NULL);
 	REQUIRE(zone != NULL);
 

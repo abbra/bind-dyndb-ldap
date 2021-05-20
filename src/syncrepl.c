@@ -131,7 +131,6 @@ finish(isc_task_t *task, isc_event_t *event) {
 	sync_barrierev_t *bev = NULL;
 	sync_state_t new_state;
 
-	REQUIRE(ISCAPI_TASK_VALID(task));
 	REQUIRE(event != NULL);
 
 	bev = (sync_barrierev_t *)event;
@@ -206,8 +205,8 @@ barrier_decrement(isc_task_t *task, isc_event_t *event) {
 	sync_barrierev_t *bev = NULL;
 	uint32_t cnt;
 
-	REQUIRE(ISCAPI_TASK_VALID(task));
 	REQUIRE(event != NULL);
+	UNUSED(task);
 
 	bev = (sync_barrierev_t *)event;
 #if LIBDNS_VERSION_MAJOR < 1600
@@ -458,7 +457,6 @@ sync_task_add(sync_ctx_t *sctx, isc_task_t *task) {
 	uint32_t cnt;
 
 	REQUIRE(sctx != NULL);
-	REQUIRE(ISCAPI_TASK_VALID(task));
 
 	newel = isc_mem_get(sctx->mctx, sizeof(*(newel)));
 	ZERO_PTR(newel);

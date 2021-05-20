@@ -1026,7 +1026,7 @@ ldapdb_associate(isc_mem_t *mctx, node_name_t *name, dns_dbtype_t type,
 	ldap_instance_t *ldap_inst = driverarg;
 	zone_register_t *zr = NULL;
 
-	REQUIRE(ISCAPI_MCTX_VALID(mctx));
+	UNUSED(mctx);
 	REQUIRE(type == LDAP_DB_TYPE);
 	REQUIRE(rdclass == LDAP_DB_RDATACLASS);
 	REQUIRE(argc == 0);
