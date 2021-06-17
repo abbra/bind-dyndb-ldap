@@ -1156,6 +1156,7 @@ dyndb_init(isc_mem_t *mctx, const char *name, const char *parameters,
 	RUNTIME_CHECK(isc_once_do(&library_init_once, library_init)
 		      == ISC_R_SUCCESS);
 
+#if LIBDNS_VERSION_MAJOR < 1617
 	/*
 	 * Depending on how dlopen() was called, we may not have
 	 * access to named's global namespace, in which case we need
@@ -1168,6 +1169,7 @@ dyndb_init(isc_mem_t *mctx, const char *name, const char *parameters,
 		isc_hash_set_initializer(dctx->hashinit);
 		log_debug(5, "registering library from dynamic ldap driver, %p != %p.", dctx->refvar, &isc_bind9);
 	}
+#endif
 
 	log_debug(2, "registering dynamic ldap driver for %s.", name);
 
