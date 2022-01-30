@@ -17,7 +17,7 @@
 #define _STR_MEM_FLARG_PASS	, file, line
 #else
 #define _STR_MEM_FILELINE
-#define _STR_MEM_FLAG
+#define _STR_MEM_FLARG
 #define _STR_MEM_FLARG_PASS
 #endif
 

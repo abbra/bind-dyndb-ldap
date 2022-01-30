@@ -281,7 +281,11 @@ acl_configure_zone_ssutable(const char *policy_str, dns_zone_t *zone)
 		goto cleanup;
 	}
 
+#if LIBDNS_VERSION_MAJOR >= 1700
+	dns_ssutable_create(mctx, &table);
+#else
 	CHECK(dns_ssutable_create(mctx, &table));
+#endif
 
 	for (el = cfg_list_first(policy); el != NULL; el = cfg_list_next(el)) {
 		const cfg_obj_t *stmt;
@@ -303,9 +307,14 @@ acl_configure_zone_ssutable(const char *policy_str, dns_zone_t *zone)
 		result = get_fixed_name(stmt, "name", &fname);
 		if (result == ISC_R_NOTFOUND &&
 		    match_type == dns_ssumatchtype_subdomain) {
+#if LIBDNS_VERSION_MAJOR >= 1700
+			dns_name_copy(dns_zone_getorigin(zone),
+				      dns_fixedname_initname(&fname));
+#else
 			CHECK(dns_name_copy(dns_zone_getorigin(zone),
 					    dns_fixedname_initname(&fname),
 					    &fname.buffer));
+#endif
 		}
 		else if (result != ISC_R_SUCCESS)
 			goto cleanup;

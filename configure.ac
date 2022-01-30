@@ -53,6 +53,18 @@ AC_TRY_COMPILE([
 [CFLAGS="$SAVED_CFLAGS"
  AC_MSG_RESULT([no])])
 
+# Check if build chain supports -std=gnu11
+AC_MSG_CHECKING([for -std=gnu11 compiler flag])
+SAVED_CFLAGS="$CFLAGS"
+CFLAGS="-std=gnu11 -Werror"
+AC_TRY_COMPILE([
+	extern int fdef(void);
+],[],
+[AC_MSG_RESULT([yes])
+ CFLAGS="$SAVED_CFLAGS -std=gnu11"],
+[CFLAGS="$SAVED_CFLAGS"
+ AC_MSG_RESULT([no])])
+
 # Get CFLAGS from isc-config.sh
 AC_ARG_VAR([BIND9_CFLAGS],
            [C compiler flags for bind9, overriding isc-config.sh])
@@ -98,6 +110,7 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([
 #include <dns/version.h>
 ],[ printf("%d\n", dns_libinterface) ])], [
     LIBDNS_VERSION_MAJOR=`./conftest$ac_exeext`
+    AC_MSG_RESULT([$LIBDNS_VERSION_MAJOR])
     AC_DEFINE_UNQUOTED([LIBDNS_VERSION_MAJOR], [$LIBDNS_VERSION_MAJOR],
     [Define libdns version])], [
     AC_RUN_IFELSE([AC_LANG_PROGRAM([[
@@ -111,9 +124,24 @@ AC_RUN_IFELSE([AC_LANG_PROGRAM([
 	return !(scanned == 3 && major == 9);
     ]])], [
     LIBDNS_VERSION_MAJOR=`./conftest$ac_exeext`
+    AC_MSG_RESULT([$LIBDNS_VERSION_MAJOR])
     AC_DEFINE_UNQUOTED([LIBDNS_VERSION_MAJOR], [$LIBDNS_VERSION_MAJOR],
     [Define libdns version])],
-    [AC_MSG_ERROR([Can't obtain libdns version.])])
+    [
+	LIBDNS_PATH="${libdir}/libdns.so"
+	if test -L "$LIBDNS_PATH" ; then
+		LIBDNS_VERSION_MAJOR=$(ls -l "$LIBDNS_PATH" | sed -e 's/^.*->\s*libdns-9\.\([[0-9]]\+\)\.\([[0-9]]\+\).*\.so/\1 \2/' -e t -e d | xargs printf "%02d%02d")
+	else
+		AC_MSG_ERROR([Can't obtain libdns version1.])
+	fi
+	if test -z "$LIBDNS_VERSION_MAJOR" || test "$LIBDNS_VERSION_MAJOR" -lt 1200; then
+		AC_MSG_ERROR([Can't obtain libdns version ($LIBDNS_VERSION_MAJOR).])
+	else
+		AC_DEFINE_UNQUOTED([LIBDNS_VERSION_MAJOR], [$LIBDNS_VERSION_MAJOR],
+    			[Define libdns version])
+		AC_MSG_RESULT([$LIBDNS_VERSION_MAJOR])
+	fi
+    ])
 ], [AC_MSG_ERROR([Cross compiling is not supported.])]
 )
 
@@ -135,6 +163,10 @@ int main(void) {
 dnl dns_db_setservestalettl() can be backported, detect support
 AC_CHECK_LIB([dns], [dns_db_setservestalettl],
   [AC_DEFINE([HAVE_DNS_SERVESTALE], 1, [Define if dns library provides dns_db_setservestalettl])]
+)
+
+AC_CHECK_LIB([dns], [dns_result_totext],
+  [AC_DEFINE([HAVE_DNS_RESULT_TOTEXT], 1, [Define if dns library provides dns_result_totext])]
 )
 
 dnl Older autoconf (2.59, for example) doesn't define docdir

@@ -15,8 +15,13 @@
 #include <dns/result.h>
 
 #include "log.h"
+#include "dyndb-config.h"
 
 extern bool verbose_checks; /* from settings.c */
+
+#ifndef HAVE_DNS_RESULT_TOTEXT
+#define dns_result_totext isc_result_totext
+#endif
 
 #define CLEANUP_WITH(result_code)				\
 	do {							\
