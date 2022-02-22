@@ -129,7 +129,7 @@ void
 finish(isc_task_t *task, isc_event_t *event) {
 	isc_result_t result = ISC_R_SUCCESS;
 	sync_barrierev_t *bev = NULL;
-	sync_state_t new_state;
+	sync_state_t new_state = sync_configinit;
 
 	REQUIRE(event != NULL);
 	UNUSED(task);
@@ -496,8 +496,8 @@ isc_result_t
 sync_barrier_wait(sync_ctx_t *sctx, ldap_instance_t *inst) {
 	isc_event_t *ev = NULL;
 	sync_barrierev_t *bev = NULL;
-	sync_state_t barrier_state;
-	sync_state_t final_state;
+	sync_state_t barrier_state = sync_configinit;
+	sync_state_t final_state = sync_configinit;
 	task_element_t *taskel = NULL;
 	task_element_t *next_taskel = NULL;
 

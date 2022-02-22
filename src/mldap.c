@@ -44,6 +44,9 @@
 #else
 /* BIND 9.16+ */
 #define REFCOUNT_CAST(n) ((isc_refcount_t) (n))
+#if LIBDNS_VERSION_MAJOR >= 1714
+#define dns_name_copynf(src, dst) dns_name_copy((src), (dst))
+#endif
 #endif
 
 /* name "ldap.uuid." */
@@ -495,7 +498,7 @@ mldap_iter_deadnodes_next(mldapdb_t *mldap, metadb_iter_t **iterp,
 	isc_result_t result;
 	dns_dbnode_t *rbt_node = NULL;
 	metadb_iter_t *iter = NULL;
-	uint32_t node_generation;
+	uint32_t node_generation = 0;
 	uint32_t cur_generation;
 	metadb_node_t metadb_node;
 	DECLARE_BUFFERED_NAME(name);

@@ -5,6 +5,7 @@
 #include "dyndb-config.h"
 #define HAVE_TLS 1
 #define HAVE_THREAD_LOCAL 1
+#include <threads.h>
 
 #include <dns/dyndb.h>
 #include <dns/diff.h>
@@ -3760,7 +3761,7 @@ static void ATTR_NONNULLS
 update_zone(isc_task_t *task, isc_event_t *event)
 {
 	ldap_syncreplevent_t *pevent = (ldap_syncreplevent_t *)event;
-	isc_result_t result ;
+	isc_result_t result = ISC_R_SUCCESS;
 	ldap_instance_t *inst = pevent->inst;
 	isc_mem_t *mctx;
 	dns_name_t prevname;

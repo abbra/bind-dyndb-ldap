@@ -11,11 +11,13 @@
 #include <isc/buffer.h>
 #include <isc/commandline.h>
 #include <isc/hash.h>
-#include <isc/lib.h>
 #include <isc/mem.h>
 #include <isc/once.h>
 #include <isc/refcount.h>
 #include <isc/util.h>
+#if LIBDNS_VERSION_MAJOR < 1617
+#include <isc/lib.h>
+#endif
 
 #include <dns/db.h>
 #include <dns/diff.h>
@@ -238,6 +240,7 @@ endload(dns_db_t *db, dns_rdatacallbacks_t *callbacks) {
 	return ISC_R_SUCCESS;
 }
 
+#if LIBDNS_VERSION_MAJOR < 1719
 static isc_result_t
 serialize(dns_db_t *db, dns_dbversion_t *version, FILE *file)
 {
@@ -247,6 +250,7 @@ serialize(dns_db_t *db, dns_dbversion_t *version, FILE *file)
 
 	return dns_db_serialize(ldapdb->rbtdb, version, file);
 }
+#endif
 
 /* !!! This could be required for optimizations (like on-disk cache). */
 static isc_result_t
@@ -635,6 +639,7 @@ issecure(dns_db_t *db)
 	return dns_db_issecure(ldapdb->rbtdb);
 }
 
+#if LIBDNS_VERSION_MAJOR < 1721
 static unsigned int
 nodecount(dns_db_t *db)
 {
@@ -644,6 +649,17 @@ nodecount(dns_db_t *db)
 
 	return dns_db_nodecount(ldapdb->rbtdb);
 }
+#else
+static unsigned int
+nodecount(dns_db_t *db, dns_dbtree_t tree)
+{
+	ldapdb_t *ldapdb = (ldapdb_t *) db;
+
+	REQUIRE(VALID_LDAPDB(ldapdb));
+
+	return dns_db_nodecount(ldapdb->rbtdb, tree);
+}
+#endif
 
 /**
  * Return TRUE, because database does not need to be loaded from disk
@@ -896,7 +912,7 @@ getservestalettl(dns_db_t *db, dns_ttl_t *ttl) {
 }
 #endif
 
-#if LIBDNS_VERSION_MAJOR >= 1606
+#if LIBDNS_VERSION_MAJOR >= 1606 && LIBDNS_VERSION_MAJOR < 1720
 /* Used for cache size adjustments, called by dns_cache_setcachesize.
  * Just proxy to rbtdb implementation. */
 static isc_result_t
@@ -914,7 +930,9 @@ static dns_dbmethods_t ldapdb_methods = {
 	detach,
 	beginload,
 	endload,
+#if LIBDNS_VERSION_MAJOR < 1719
 	serialize, /* see dns_db_serialize(), implementation is not mandatory */
+#endif
 	dump,
 	currentversion,
 	newversion,
@@ -966,7 +984,7 @@ static dns_dbmethods_t ldapdb_methods = {
 #if LIBDNS_VERSION_MAJOR >= 1600
 	NULL, /* setgluecachestats */
 #endif
-#if LIBDNS_VERSION_MAJOR >= 1606
+#if LIBDNS_VERSION_MAJOR >= 1606 && LIBDNS_VERSION_MAJOR < 1720
 	adjusthashsize, /* adjusthashsize */
 #endif
 };

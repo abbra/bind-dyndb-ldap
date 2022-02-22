@@ -29,6 +29,8 @@
 
 #if LIBDNS_VERSION_MAJOR < 1600
 #define dns_name_copynf(src, dst) dns_name_copy((src), (dst), NULL)
+#elif LIBDNS_VERSION_MAJOR >= 1714
+#define dns_name_copynf(src, dst) dns_name_copy((src), (dst))
 #endif
 
 /**
