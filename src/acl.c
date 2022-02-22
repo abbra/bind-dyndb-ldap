@@ -66,6 +66,10 @@ const enum_txt_assoc_t acl_type_txts[] = {
 		}							\
 	} while (0)
 
+#if LIBDNS_VERSION_MAJOR < 1700
+typedef dns_rdatatype_t dns_ssuruletype_t;
+#endif
+
 static isc_result_t ATTR_NONNULLS ATTR_CHECKRESULT
 get_mode(const cfg_obj_t *obj, bool *value)
 {
@@ -184,14 +188,14 @@ count_list_elements(const cfg_obj_t *list)
 }
 
 static isc_result_t ATTR_NONNULLS ATTR_CHECKRESULT
-get_types(isc_mem_t *mctx, const cfg_obj_t *obj, dns_rdatatype_t **typesp,
+get_types(isc_mem_t *mctx, const cfg_obj_t *obj, dns_ssuruletype_t **typesp,
 	  unsigned int *np)
 {
 	isc_result_t result = ISC_R_SUCCESS;
 	unsigned int i;
 	unsigned int n = 0;
 	const cfg_listelt_t *el;
-	dns_rdatatype_t *types = NULL;
+	dns_ssuruletype_t *types = NULL;
 
 	REQUIRE(obj != NULL);
 	REQUIRE(typesp != NULL && *typesp == NULL);
@@ -201,7 +205,7 @@ get_types(isc_mem_t *mctx, const cfg_obj_t *obj, dns_rdatatype_t **typesp,
 
 	n = count_list_elements(obj);
 	if (n > 0) {
-		types = isc_mem_get(mctx, n * sizeof(dns_rdatatype_t));
+		types = isc_mem_get(mctx, n * sizeof(dns_ssuruletype_t));
 	}
 	i = 0;
 	for (el = cfg_list_first(obj); el != NULL; el = cfg_list_next(el)) {
@@ -216,7 +220,12 @@ get_types(isc_mem_t *mctx, const cfg_obj_t *obj, dns_rdatatype_t **typesp,
 		DE_CONST(str, r.base);
 		r.length = strlen(str);
 
+#if LIBDNS_VERSION_MAJOR < 1700
 		result = dns_rdatatype_fromtext(&types[i++], &r);
+#else
+		types[i].max = 0;
+		result = dns_rdatatype_fromtext(&types[i++].type, &r);
+#endif
 		if (result != ISC_R_SUCCESS) {
 			log_error("'%s' is not a valid type", str);
 			goto cleanup;
@@ -229,7 +238,7 @@ get_types(isc_mem_t *mctx, const cfg_obj_t *obj, dns_rdatatype_t **typesp,
 	return result;
 
 cleanup:
-	SAFE_MEM_PUT(mctx, types, n * sizeof(dns_rdatatype_t));
+	SAFE_MEM_PUT(mctx, types, n * sizeof(dns_ssuruletype_t));
 
 	return result;
 }
@@ -292,7 +301,7 @@ acl_configure_zone_ssutable(const char *policy_str, dns_zone_t *zone)
 		bool grant;
 		unsigned int match_type;
 		dns_fixedname_t fname, fident;
-		dns_rdatatype_t *types;
+		dns_ssuruletype_t *types;
 		unsigned int n;
 
 		types = NULL;
@@ -333,13 +342,22 @@ acl_configure_zone_ssutable(const char *policy_str, dns_zone_t *zone)
 			CLEANUP_WITH(DNS_R_BADNAME);
 		}
 
+#if LIBDNS_VERSION_MAJOR >= 1700
+		result = ISC_R_SUCCESS;
+		dns_ssutable_addrule(table, grant,
+				     dns_fixedname_name(&fident),
+				     match_type,
+				     dns_fixedname_name(&fname),
+				     n, types);
+#else
 		result = dns_ssutable_addrule(table, grant,
 					      dns_fixedname_name(&fident),
 					      match_type,
 					      dns_fixedname_name(&fname),
 					      n, types);
+#endif
 
-		SAFE_MEM_PUT(mctx, types, n * sizeof(dns_rdatatype_t));
+		SAFE_MEM_PUT(mctx, types, n * sizeof(dns_ssuruletype_t));
 		if (result != ISC_R_SUCCESS)
 			goto cleanup;
 
