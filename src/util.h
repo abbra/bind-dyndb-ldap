@@ -23,6 +23,12 @@ extern bool verbose_checks; /* from settings.c */
 #define dns_result_totext isc_result_totext
 #endif
 
+#if LIBDNS_VERSION_MAJOR < 1600
+#define dns_name_copynf(src, dst) dns_name_copy((src), (dst), NULL)
+#elif LIBDNS_VERSION_MAJOR >= 1714
+#define dns_name_copynf(src, dst) dns_name_copy((src), (dst))
+#endif
+
 #define CLEANUP_WITH(result_code)				\
 	do {							\
 		result = (result_code);				\

@@ -30,7 +30,6 @@
 #include "dyndb-config.h"
 
 #if LIBDNS_VERSION_MAJOR < 1600
-#define dns_name_copynf(src, dst) dns_name_copy((src), (dst), NULL)
 #define REFCOUNT_CAST(n) ((typeof(((isc_refcount_t *)0)->refs)) (n))
 
 /* Static assert is not provided yet, copy from 9.16 */
@@ -44,9 +43,6 @@
 #else
 /* BIND 9.16+ */
 #define REFCOUNT_CAST(n) ((isc_refcount_t) (n))
-#if LIBDNS_VERSION_MAJOR >= 1714
-#define dns_name_copynf(src, dst) dns_name_copy((src), (dst))
-#endif
 #endif
 
 /* name "ldap.uuid." */
