@@ -595,10 +595,12 @@ fwd_configure_zone(const settings_set_t *set, ldap_instance_t *inst,
 		  dns_result_totext(result));
 
 	/* Handle collisions with automatic empty zones. */
-	if (isconfigured == true)
+	if (isconfigured == true) {
+		run_exclusive_enter(inst, &lock_state);
 		CHECK(empty_zone_handle_conflicts(name,
 						  view->zonetable,
 						  (fwdpolicy == dns_fwdpolicy_first)));
+	}
 
 cleanup:
 	run_exclusive_exit(inst, lock_state);
