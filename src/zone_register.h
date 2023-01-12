@@ -5,6 +5,7 @@
 #ifndef _LD_ZONE_REGISTER_H_
 #define _LD_ZONE_REGISTER_H_
 
+#include <isc/rwlock.h>
 #include <dns/zt.h>
 
 #include "settings.h"
