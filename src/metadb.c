@@ -217,7 +217,8 @@ metadb_node_delete(metadb_node_t **nodep) {
 	node = *nodep;
 
 	dns_rdataset_init(&rdataset);
-	CHECK(dns_db_allrdatasets(node->rbtdb, node->dbnode, node->version, 0,
+	CHECK(dns_db_allrdatasets(node->rbtdb, node->dbnode, node->version,
+				  DNS_DB_ALLRDATASETS_OPTIONS(0, 0),
 				  &iter));
 
 	for (result = dns_rdatasetiter_first(iter);

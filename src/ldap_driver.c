@@ -465,13 +465,14 @@ findrdataset(dns_db_t *db, dns_dbnode_t *node, dns_dbversion_t *version,
 
 static isc_result_t
 allrdatasets(dns_db_t *db, dns_dbnode_t *node, dns_dbversion_t *version,
-	     isc_stdtime_t now, dns_rdatasetiter_t **iteratorp)
+	     DNS_DB_ALLRDATASETS_OPTIONS(unsigned int options, isc_stdtime_t now),
+	     dns_rdatasetiter_t **iteratorp)
 {
 	ldapdb_t *ldapdb = (ldapdb_t *) db;
 
 	REQUIRE(VALID_LDAPDB(ldapdb));
 
-	return dns_db_allrdatasets(ldapdb->rbtdb, node, version, now, iteratorp);
+	return dns_db_allrdatasets(ldapdb->rbtdb, node, version, DNS_DB_ALLRDATASETS_OPTIONS(options, now), iteratorp);
 }
 
 /* TODO: Add 'tainted' flag to the LDAP instance if something went wrong. */
@@ -514,7 +515,7 @@ node_isempty(dns_db_t *db, dns_dbnode_t *node, dns_dbversion_t *version,
 
 	CHECK(ldapdb_name_fromnode(node, dns_fixedname_initname(&fname)));
 
-	result = dns_db_allrdatasets(db, node, version, now, &rds_iter);
+	result = dns_db_allrdatasets(db, node, version, DNS_DB_ALLRDATASETS_OPTIONS(0, now), &rds_iter);
 	if (result == ISC_R_NOTFOUND) {
 		*isempty = true;
 	} else if (result == ISC_R_SUCCESS) {

@@ -2005,7 +2005,7 @@ zone_sync_apex(const ldap_instance_t * const inst,
 				 zone_settings, &rdatalist));
 
 	CHECK(dns_db_getoriginnode(rbtdb, &node));
-	result = dns_db_allrdatasets(rbtdb, node, version, 0,
+	result = dns_db_allrdatasets(rbtdb, node, version, DNS_DB_ALLRDATASETS_OPTIONS(0, 0),
 				     &rbt_rds_iterator);
 	if (result == ISC_R_SUCCESS) {
 		CHECK(diff_ldap_rbtdb(inst->mctx, &name, &rdatalist,
@@ -3929,7 +3929,7 @@ update_restart:
 	CHECK(dns_db_newversion(ldapdb, &version));
 
 	CHECK(dns_db_findnode(rbtdb, &entry->fqdn, true, &node));
-	result = dns_db_allrdatasets(rbtdb, node, version, 0, &rbt_rds_iterator);
+	result = dns_db_allrdatasets(rbtdb, node, version, DNS_DB_ALLRDATASETS_OPTIONS(0, 0), &rbt_rds_iterator);
 	if (result != ISC_R_SUCCESS && result != ISC_R_NOTFOUND)
 		goto cleanup;
 
