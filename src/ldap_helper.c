@@ -1317,8 +1317,7 @@ configure_zone_acl(isc_mem_t *mctx, dns_zone_t *zone,
 			dns_zone_logc(zone, DNS_LOGCATEGORY_SECURITY, ISC_LOG_CRITICAL,
 				      "cannot configure restrictive %s policy: %s",
 				      type_txt, isc_result_totext(result2));
-			FATAL_ERROR(__FILE__, __LINE__,
-				    "insecure state detected");
+			fatal_error("insecure state detected");
 		}
 	}
 	acl_setter(zone, acl);
@@ -1365,8 +1364,7 @@ configure_zone_ssutable(dns_zone_t *zone, const char *update_str)
 			dns_zone_logc(zone, DNS_LOGCATEGORY_SECURITY, ISC_LOG_CRITICAL,
 				      "cannot disable all updates: %s",
 				      isc_result_totext(result2));
-			FATAL_ERROR(__FILE__, __LINE__,
-				    "insecure state detected");
+			fatal_error("insecure state detected");
 		}
 	}
 
@@ -2951,8 +2949,7 @@ force_reconnect:
 						   ldap_inst);
 		break;
 	case AUTH_INVALID:
-		UNEXPECTED_ERROR(__FILE__, __LINE__,
-				"invalid auth_method_enum value %u",
+		unexpected_error("invalid auth_method_enum value %u",
 				 auth_method_enum);
 		break;
 
@@ -3782,8 +3779,7 @@ update_zone(isc_task_t *task, isc_event_t *event)
 		else if (entry->class & LDAP_ENTRYCLASS_FORWARD)
 			CHECK(ldap_parse_fwd_zoneentry(entry, inst));
 		else
-			FATAL_ERROR(__FILE__, __LINE__,
-				    "update_zone: unexpected entry class");
+			fatal_error("update_zone: unexpected entry class");
 	}
 
 cleanup:

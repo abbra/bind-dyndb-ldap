@@ -17,8 +17,17 @@
 #define GET_LOG_LEVEL(level)	(level)
 #endif
 
+#if LIBDNS_VERSION_MAJOR >= 1809
+#define fatal_error(...) \
+	isc_error_fatal(__FILE__, __LINE__, __func__, __VA_ARGS__)
+#define unexpected_error(...) \
+	isc_error_unexpected(__FILE__, __LINE__, __func__, __VA_ARGS__)
+#else
 #define fatal_error(...) \
 	isc_error_fatal(__FILE__, __LINE__, __VA_ARGS__)
+#define unexpected_error(...) \
+	isc_error_unexpected(__FILE__, __LINE__, __VA_ARGS__)
+#endif
 
 #define log_bug(fmt, ...) \
 	log_error("bug in %s(): " fmt, __func__,##__VA_ARGS__)

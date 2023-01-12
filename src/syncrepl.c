@@ -148,8 +148,7 @@ finish(isc_task_t *task, isc_event_t *event) {
 		case sync_datainit:
 		case sync_finished:
 		default:
-			FATAL_ERROR(__FILE__, __LINE__,
-				    "sync_barrier_wait(): invalid state "
+			fatal_error("sync_barrier_wait(): invalid state "
 				    "%u", bev->sctx->state);
 	}
 	sync_state_change(bev->sctx, new_state, false);
@@ -518,8 +517,7 @@ sync_barrier_wait(sync_ctx_t *sctx, ldap_instance_t *inst) {
 		case sync_databarrier:
 		case sync_finished:
 		default:
-			FATAL_ERROR(__FILE__, __LINE__,
-				    "sync_barrier_wait(): invalid state "
+			fatal_error("sync_barrier_wait(): invalid state "
 				    "%u", sctx->state);
 	}
 

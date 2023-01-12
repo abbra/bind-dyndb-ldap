@@ -178,8 +178,7 @@ setting_get(const char *const name, const setting_type_t type,
 		*(bool *)target = setting->value.value_boolean;
 		break;
 	default:
-		UNEXPECTED_ERROR(__FILE__, __LINE__,
-				 "invalid setting_type_t value %u", type);
+		unexpected_error("invalid setting_type_t value %u", type);
 		break;
 	}
 
@@ -278,8 +277,7 @@ set_value(isc_mem_t *mctx, const settings_set_t *set, setting_t *setting,
 			CLEANUP_WITH(ISC_R_IGNORE);
 		break;
 	default:
-		UNEXPECTED_ERROR(__FILE__, __LINE__,
-				 "invalid setting_type_t value %u", setting->type);
+		unexpected_error("invalid setting_type_t value %u", setting->type);
 		break;
 	}
 
@@ -304,8 +302,7 @@ set_value(isc_mem_t *mctx, const settings_set_t *set, setting_t *setting,
 		setting->value.value_boolean = numeric_value;
 		break;
 	default:
-		UNEXPECTED_ERROR(__FILE__, __LINE__,
-				 "invalid setting_type_t value %u", setting->type);
+		unexpected_error("invalid setting_type_t value %u", setting->type);
 		break;
 	}
 	setting->filled = 1;
@@ -389,8 +386,7 @@ setting_unset(const char *const name, const settings_set_t *set)
 	case ST_BOOLEAN:
 		break;
 	default:
-		UNEXPECTED_ERROR(__FILE__, __LINE__,
-				 "invalid setting_type_t value %u", setting->type);
+		unexpected_error("invalid setting_type_t value %u", setting->type);
 		break;
 	}
 	setting->filled = 0;
