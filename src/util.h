@@ -13,6 +13,7 @@
 #include <dns/types.h>
 #include <dns/name.h>
 #include <dns/result.h>
+#include <dns/db.h>
 
 #include "log.h"
 #include "dyndb-config.h"
@@ -29,7 +30,7 @@ extern bool verbose_checks; /* from settings.c */
 #define dns_name_copynf(src, dst) dns_name_copy((src), (dst))
 #endif
 
-#if LIBDNS_VERSION_MAJOR >= 1810
+#ifdef DNS_DB_STALEOK
 #define DNS_DB_ALLRDATASETS_OPTIONS(options, tstamp) options, tstamp
 #else
 #define DNS_DB_ALLRDATASETS_OPTIONS(options, tstamp) tstamp
