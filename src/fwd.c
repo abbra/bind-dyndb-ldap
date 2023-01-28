@@ -198,7 +198,9 @@ fwd_print_list_buff(isc_mem_t *mctx, dns_forwarders_t *fwdrs,
 	     INSIST((fwdr_int == NULL) == (fwdr_cfg == NULL)), fwdr_int != NULL;
 	     fwdr_int = ISC_LIST_NEXT(fwdr_int, link), fwdr_cfg = cfg_list_next(fwdr_cfg)) {
 		fwdr_cfg->obj->value.sockaddrdscp.sockaddr = fwdr_int->addr;
+#if LIBDNS_VERSION_MAJOR < 1811
 		fwdr_cfg->obj->value.sockaddrdscp.dscp = fwdr_int->dscp;
+#endif
 	}
 	cfg_print(faddresses, buffer_append_str, &tmp_buf);
 
@@ -281,7 +283,9 @@ fwd_parse_str(const char *fwdrs_str, isc_mem_t *mctx,
 			isc_sockaddr_setport(&addr, port);
 		fwdr = isc_mem_get(mctx, sizeof(*(fwdr)));
 		fwdr->addr = addr;
+#if LIBDNS_VERSION_MAJOR < 1811
 		fwdr->dscp = cfg_obj_getdscp(fwdr_cfg);
+#endif
 		ISC_LINK_INIT(fwdr, link);
 		ISC_LIST_APPEND(*fwdrs, fwdr, link);
 	}
